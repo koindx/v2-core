@@ -1,0 +1,133 @@
+syntax = "proto3";
+import "koinos/options.proto";
+package core;
+
+/*
+* RPC calls
+*/
+
+// @description Returns the token's name
+// @read-only true
+message name_arguments {}
+message name_result {
+  string value = 1;
+}
+// @description Returns the token's symbol
+// @read-only true
+message symbol_arguments {}
+message symbol_result {
+  string value = 1;
+}
+// @description Returns the token's decimals precision
+// @read-only true
+message decimals_arguments {}
+message decimals_result {
+  uint32 value = 1;
+}
+// @description Returns the token's total supply
+// @read-only true
+message total_supply_arguments {}
+message total_supply_result {
+  uint64 value = 1 [jstype = JS_STRING];
+}
+// @description initializing core contract
+// @read-only true
+message get_reserves_arguments {}
+message get_reserves_result {
+  uint64 reserve_a = 1 [jstype = JS_STRING];
+  uint64 reserve_b = 2 [jstype = JS_STRING];
+  uint64 block_time = 3 [jstype = JS_STRING];
+}
+// @description Checks the balance at an address
+// @read-only true
+message balance_of_arguments {
+  bytes owner = 1 [(koinos.btype) = ADDRESS];
+}
+message balance_of_result {
+  uint64 value = 1 [jstype = JS_STRING];
+}
+// @description initializing core contract
+// @read-only false
+message initialize_arguments {
+  bytes token_a = 1 [(koinos.btype) = ADDRESS];
+  bytes token_b = 2 [(koinos.btype) = ADDRESS];
+}
+message initialize_result {}
+// @description mint core contract
+// @read-only false
+message mint_arguments {
+  bytes to = 1 [(koinos.btype) = ADDRESS];
+  bytes fee = 2 [(koinos.btype) = ADDRESS];
+}
+message mint_result {}
+// @description mint core contract
+// @read-only false
+message burn_arguments {
+  bytes to = 1 [(koinos.btype) = ADDRESS];
+  bytes fee = 2 [(koinos.btype) = ADDRESS];
+}
+message burn_result {}
+// @description swap core contract
+// @read-only false
+message swap_arguments {
+  bytes to = 1 [(koinos.btype) = ADDRESS];
+  uint64 amount_a = 2 [jstype = JS_STRING];
+  uint64 amount_b = 3 [jstype = JS_STRING];
+}
+message swap_result {}
+// @description swap core contract
+// @read-only false
+message skim_arguments {
+  bytes to = 1 [(koinos.btype) = ADDRESS];
+}
+message skim_result {}
+// @description swap core contract
+// @read-only false
+message sync_arguments {}
+message sync_result {}
+
+
+/*
+* Objects
+*/
+message balance_object {
+  uint64 value = 1 [jstype = JS_STRING];
+}
+message config_object {
+  bytes token_a = 1 [(koinos.btype) = ADDRESS];
+  bytes token_b = 2 [(koinos.btype) = ADDRESS];
+  uint64 k_last = 3 [jstype = JS_STRING];
+  uint64 price_a = 4 [jstype = JS_STRING];
+  uint64 price_b = 5 [jstype = JS_STRING];
+  uint64 reserve_a = 6 [jstype = JS_STRING];
+  uint64 reserve_b = 7 [jstype = JS_STRING];
+  uint64 block_time = 8 [jstype = JS_STRING];
+}
+
+
+/*
+* Events
+*/
+message mint_event {
+  bytes sender = 1 [(koinos.btype) = ADDRESS];
+  uint64 amount_a = 2 [(koinos.btype) = ADDRESS];
+  uint64 amount_b = 3 [(koinos.btype) = ADDRESS];
+}
+message burn_event {
+  bytes to = 1 [(koinos.btype) = ADDRESS];
+  bytes sender = 2 [(koinos.btype) = ADDRESS];
+  uint64 amount_a = 3 [(koinos.btype) = ADDRESS];
+  uint64 amount_b = 4 [(koinos.btype) = ADDRESS];
+}
+message swap_event {
+  bytes to = 1 [(koinos.btype) = ADDRESS];
+  bytes sender = 2 [(koinos.btype) = ADDRESS];
+  uint64 amount_in_a = 3 [(koinos.btype) = ADDRESS];
+  uint64 amount_in_b = 4 [(koinos.btype) = ADDRESS];
+  uint64 amount_out_a = 5 [(koinos.btype) = ADDRESS];
+  uint64 amount_out_b = 6 [(koinos.btype) = ADDRESS];
+}
+message sync_event {
+  uint64 reserve_a = 1 [jstype = JS_STRING];
+  uint64 reserve_b = 2 [jstype = JS_STRING];
+}
