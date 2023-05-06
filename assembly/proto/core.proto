@@ -3,33 +3,107 @@ import "koinos/options.proto";
 package core;
 
 /*
+* Objects
+*/
+message str {
+  string value = 1;
+}
+message uint32 {
+  uint32 value = 1;
+}
+message uint64 {
+  uint64 value = 1 [jstype = JS_STRING];
+}
+message boole {
+  bool value = 1;
+}
+message empty_object {
+}
+message info {
+  string name = 1;
+  string symbol = 2;
+  uint32 decimals = 3;
+}
+message config_object {  
+  bytes token_a = 2 [(koinos.btype) = ADDRESS];
+  bytes token_b = 3 [(koinos.btype) = ADDRESS];
+  string k_last = 4;
+  uint64 reserve_a = 5 [jstype = JS_STRING];
+  uint64 reserve_b = 6 [jstype = JS_STRING];
+  uint64 block_time = 7 [jstype = JS_STRING];
+}
+
+
+/*
 * RPC calls
 */
 
-// @description Returns the token's name
+// @description Get name of the token
 // @read-only true
+// @result str
 message name_arguments {}
-message name_result {
-  string value = 1;
-}
-// @description Returns the token's symbol
+
+// @description Get the symbol of the token
 // @read-only true
+// @result str
 message symbol_arguments {}
-message symbol_result {
-  string value = 1;
-}
-// @description Returns the token's decimals precision
+
+// @description Get the decimals of the token
 // @read-only true
+// @result uint32
 message decimals_arguments {}
-message decimals_result {
-  uint32 value = 1;
-}
-// @description Returns the token's total supply
+
+// @description Get name, symbol and decimals
 // @read-only true
+// @result info
+message get_info_arguments {}
+
+// @description Get total supply
+// @read-only true
+// @result uint64
 message total_supply_arguments {}
-message total_supply_result {
-  uint64 value = 1 [jstype = JS_STRING];
+
+// @description Get balance of an account 7
+// @read-only true
+// @result uint64
+message balance_of_arguments {
+  bytes owner = 1 [(koinos.btype) = ADDRESS];
 }
+
+// @description Get balance of an account2 
+// @read-only true
+// @result uint64
+message allowance_arguments {
+  bytes owner = 1 [(koinos.btype) = ADDRESS];
+  bytes spender = 2 [(koinos.btype) = ADDRESS];
+}
+
+// @description Get balance of an account 6
+// @read-only false
+// @result empty_object
+message transfer_arguments {
+  bytes from = 1 [(koinos.btype) = ADDRESS];
+  bytes to = 2 [(koinos.btype) = ADDRESS];
+  uint64 value = 3 [jstype = JS_STRING];
+}
+
+// @description Get balance of an account 3
+// @read-only false
+// @result empty_object
+message approve_arguments {
+  bytes owner = 1 [(koinos.btype) = ADDRESS];
+  bytes spender = 2 [(koinos.btype) = ADDRESS];
+  uint64 value = 3 [jstype = JS_STRING];
+}
+
+// @description Get balance of an account 1 
+// @read-only false
+// @result empty_object
+message set_authority_contract_arguments {
+  bytes account = 1 [(koinos.btype) = ADDRESS];
+  bool enabled = 2;
+}
+
 // @description initializing core contract
 // @read-only true
 message get_reserves_arguments {}
@@ -38,71 +112,51 @@ message get_reserves_result {
   uint64 reserve_b = 2 [jstype = JS_STRING];
   uint64 block_time = 3 [jstype = JS_STRING];
 }
-// @description Checks the balance at an address
-// @read-only true
-message balance_of_arguments {
-  bytes owner = 1 [(koinos.btype) = ADDRESS];
-}
-message balance_of_result {
-  uint64 value = 1 [jstype = JS_STRING];
-}
+
 // @description initializing core contract
 // @read-only false
+// @result empty_object
 message initialize_arguments {
   bytes token_a = 1 [(koinos.btype) = ADDRESS];
   bytes token_b = 2 [(koinos.btype) = ADDRESS];
 }
-message initialize_result {}
+
 // @description mint core contract
 // @read-only false
+// @result empty_object
 message mint_arguments {
   bytes to = 1 [(koinos.btype) = ADDRESS];
   bytes fee = 2 [(koinos.btype) = ADDRESS];
 }
-message mint_result {}
+
 // @description mint core contract
 // @read-only false
+// @result empty_object
 message burn_arguments {
   bytes to = 1 [(koinos.btype) = ADDRESS];
   bytes fee = 2 [(koinos.btype) = ADDRESS];
 }
-message burn_result {}
+
 // @description swap core contract
 // @read-only false
+// @result empty_object
 message swap_arguments {
   bytes to = 1 [(koinos.btype) = ADDRESS];
   uint64 amount_a = 2 [jstype = JS_STRING];
   uint64 amount_b = 3 [jstype = JS_STRING];
 }
-message swap_result {}
+
 // @description swap core contract
 // @read-only false
+// @result empty_object
 message skim_arguments {
   bytes to = 1 [(koinos.btype) = ADDRESS];
 }
-message skim_result {}
+
 // @description swap core contract
 // @read-only false
+// @result empty_object
 message sync_arguments {}
-message sync_result {}
-
-
-/*
-* Objects
-*/
-message balance_object {
-  uint64 value = 1 [jstype = JS_STRING];
-}
-message config_object {
-  bytes token_a = 1 [(koinos.btype) = ADDRESS];
-  bytes token_b = 2 [(koinos.btype) = ADDRESS];
-  uint64 k_last = 3 [jstype = JS_STRING];
-  uint64 price_a = 4 [jstype = JS_STRING];
-  uint64 price_b = 5 [jstype = JS_STRING];
-  uint64 reserve_a = 6 [jstype = JS_STRING];
-  uint64 reserve_b = 7 [jstype = JS_STRING];
-  uint64 block_time = 8 [jstype = JS_STRING];
-}
 
 
 /*
