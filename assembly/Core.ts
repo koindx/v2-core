@@ -38,6 +38,7 @@ export class Core extends Base  {
   get_reserves(args: core.get_reserves_arguments): core.get_reserves_result {
     let res = new core.get_reserves_result();
     let configs = this.config.get()!;
+    res.k_last = configs.k_last;
     res.reserve_a = configs.reserve_a;
     res.reserve_b = configs.reserve_b;
     res.block_time = configs.block_time;
@@ -188,16 +189,16 @@ export class Core extends Base  {
 
     // amounts
     let amount0In = balance_a > SafeMath.sub(configs.reserve_a, args.amount_a) ? SafeMath.sub(balance_a, SafeMath.sub(configs.reserve_a, args.amount_a)) : 0;
-    let amount1In = balance_a > SafeMath.sub(configs.reserve_b, args.amount_a) ? SafeMath.sub(balance_b, SafeMath.sub(configs.reserve_b, args.amount_b)) : 0;
+    let amount1In = balance_a > SafeMath.sub(configs.reserve_b, args.amount_b) ? SafeMath.sub(balance_b, SafeMath.sub(configs.reserve_b, args.amount_b)) : 0;
     System.require(amount0In > 0 || amount1In > 0, 'KOINDX: INSUFFICIENT_INPUT_AMOUNT', 1);
 
     // update configs before save
     configs = this._update(configs, balance_a, balance_b);
     const impacted = [args.to];
-    let mintEvent = new core.swap_event(args.to, caller.caller, amount0In, amount1In);
+    let swapEvent = new core.swap_event(args.to, caller.caller, amount0In, amount1In);
     System.event(
       "core.swap_event",
-      Protobuf.encode(mintEvent, core.swap_event.encode),
+      Protobuf.encode(swapEvent, core.swap_event.encode),
       impacted
     );
     return res;
@@ -252,6 +253,20 @@ export class Core extends Base  {
     return config;
   }
   private _update(config: core.config_object, balance_a: u64, balance_b: u64): core.config_object {
+    let blockTimestampField = System.getBlockField("header.timestamp");
+    System.require(blockTimestampField != null, 'block height cannot be null');
+    let currentDate = blockTimestampField!.uint64_value as u64;
+    config.reserve_a = balance_a;
+    config.reserve_b = balance_b;
+    config.block_time = currentDate;
+
+    const impacted = [this._contractId];
+    let mintSync = new core.sync_event(balance_a, balance_b);
+    System.event(
+      "core.sync_event",
+      Protobuf.encode(mintSync, core.sync_event.encode),
+      impacted
+    );
     return config;
   }
 }

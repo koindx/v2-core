@@ -108,9 +108,10 @@ message set_authority_contract_arguments {
 // @read-only true
 message get_reserves_arguments {}
 message get_reserves_result {
-  uint64 reserve_a = 1 [jstype = JS_STRING];
-  uint64 reserve_b = 2 [jstype = JS_STRING];
-  uint64 block_time = 3 [jstype = JS_STRING];
+  string k_last = 1;
+  uint64 reserve_a = 2 [jstype = JS_STRING];
+  uint64 reserve_b = 3 [jstype = JS_STRING];
+  uint64 block_time = 4 [jstype = JS_STRING];
 }
 
 // @description initializing core contract
