@@ -124,7 +124,7 @@ message initialize_arguments {
 
 // @description mint core contract
 // @read-only false
-// @result empty_object
+// @result uint64
 message mint_arguments {
   bytes to = 1 [(koinos.btype) = ADDRESS];
   bytes fee = 2 [(koinos.btype) = ADDRESS];
@@ -132,10 +132,13 @@ message mint_arguments {
 
 // @description mint core contract
 // @read-only false
-// @result empty_object
 message burn_arguments {
   bytes to = 1 [(koinos.btype) = ADDRESS];
   bytes fee = 2 [(koinos.btype) = ADDRESS];
+}
+message burn_result {
+  uint64 amount_a = 1 [jstype = JS_STRING];
+  uint64 amount_b = 2 [jstype = JS_STRING];
 }
 
 // @description swap core contract

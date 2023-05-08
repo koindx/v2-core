@@ -26,25 +26,24 @@ export class Core extends Base  {
   }
 
   initialize(args: core.initialize_arguments): core.empty_object {
-    let res = new core.empty_object;
     let caller = System.getCaller();
     System.require(Arrays.equal(caller.caller, Constants.periphery), 'KOINDX: FORBIDDEN', 1);
     let configs = this.config.get()!;
     configs.token_a = args.token_a;
     configs.token_b = args.token_b;
     this.config.put(configs);
-    return res;
+    return new core.empty_object();
   }
   get_reserves(args: core.get_reserves_arguments): core.get_reserves_result {
-    let res = new core.get_reserves_result();
     let configs = this.config.get()!;
-    res.k_last = configs.k_last;
-    res.reserve_a = configs.reserve_a;
-    res.reserve_b = configs.reserve_b;
-    res.block_time = configs.block_time;
-    return res;
+    return new core.get_reserves_result(
+      configs.k_last,
+      configs.reserve_a,
+      configs.reserve_b,
+      configs.block_time
+    );
   }
-  mint(args: core.mint_arguments): core.empty_object {
+  mint(args: core.mint_arguments): core.uint64 {
     let res = new core.empty_object();
     let caller = System.getCaller();
     System.require(Arrays.equal(caller.caller, Constants.periphery), 'KOINDX: FORBIDDEN', 1);
@@ -103,9 +102,9 @@ export class Core extends Base  {
       Protobuf.encode(mintEvent, core.mint_event.encode),
       impacted
     );
-    return res;
+    return new core.uint64(newShares);
   }
-  burn(args: core.burn_arguments): core.empty_object {
+  burn(args: core.burn_arguments): core.burn_result {
     let res = new core.empty_object();
     let caller = System.getCaller();
     System.require(Arrays.equal(caller.caller, Constants.periphery), 'KOINDX: FORBIDDEN', 1);
@@ -163,10 +162,9 @@ export class Core extends Base  {
       Protobuf.encode(burnEvent, core.burn_event.encode),
       impacted
     );
-    return res;
+    return new core.burn_result(token0Out, token1Out);
   }
   swap(args: core.swap_arguments): core.empty_object {
-    let res = new core.empty_object();
     let caller = System.getCaller();
     System.require(Arrays.equal(caller.caller, Constants.periphery), 'KOINDX: FORBIDDEN', 1);
     System.require(args.amount_a > 0 || args.amount_b > 0, 'KOINDX: INSUFFICIENT_OUTPUT_AMOUNT', 1);
@@ -201,10 +199,9 @@ export class Core extends Base  {
       Protobuf.encode(swapEvent, core.swap_event.encode),
       impacted
     );
-    return res;
+    return new core.empty_object();
   }
   skim(args: core.skim_arguments): core.empty_object {
-    let res = new core.empty_object();
     let configs = this.config.get()!;
     let token_a = new Token(configs.token_a);
     let token_b = new Token(configs.token_b);
@@ -212,10 +209,9 @@ export class Core extends Base  {
     let balance_b = token_b.balanceOf(this._contractId);
     System.require(token_a.transfer(this._contractId, args.to, SafeMath.sub(balance_a, configs.reserve_a)), "KOINDX: FAIL_TRANSFER_TOKEN_A", 1);
     System.require(token_b.transfer(this._contractId, args.to, SafeMath.sub(balance_b, configs.reserve_b)), "KOINDX: FAIL_TRANSFER_TOKEN_B", 1);
-    return res;
+    return  new core.empty_object();
   }
   sync(args: core.sync_arguments): core.empty_object {
-    let res = new core.empty_object();
     let configs = this.config.get()!;
     let token_a = new Token(configs.token_a);
     let token_b = new Token(configs.token_b);
@@ -223,7 +219,7 @@ export class Core extends Base  {
     let balance_b = token_b.balanceOf(this._contractId);
     configs = this._update(configs, balance_a, balance_b);
     this.config.put(configs);
-    return res;
+    return new core.empty_object();
   }
 
   private _mintFee(config: core.config_object, fee: Uint8Array): core.config_object {

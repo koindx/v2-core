@@ -136,7 +136,7 @@ export function main(): i32 {
         ProtoNamespace.mint_arguments.decode
       );
       const res = c.mint(args);
-      retbuf = Protobuf.encode(res, ProtoNamespace.empty_object.encode);
+      retbuf = Protobuf.encode(res, ProtoNamespace.uint64.encode);
       break;
     }
 
@@ -146,7 +146,7 @@ export function main(): i32 {
         ProtoNamespace.burn_arguments.decode
       );
       const res = c.burn(args);
-      retbuf = Protobuf.encode(res, ProtoNamespace.empty_object.encode);
+      retbuf = Protobuf.encode(res, ProtoNamespace.burn_result.encode);
       break;
     }
 
