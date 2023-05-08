@@ -237,6 +237,7 @@ export class Token {
 
     // // check the signatures related to allowances
     const signers = this.getSigners();
+    // commented until further verification is made
     // for (let i = 0; i < signers.length; i += 1) {
     //   if (acceptAllowances) {
     //     // check if the signer is approved for all tokens
@@ -277,7 +278,7 @@ export class Token {
 
     const impacted = [args.spender, args.owner];
     System.event(
-      "koinos.contracts.token.approve_event",
+      "token.approve_event",
       this.callArgs!.args,
       impacted
     );
@@ -298,7 +299,7 @@ export class Token {
 
     const impacted = [args.to, args.from];
     System.event(
-      "koinos.contracts.token.transfer_event",
+      "token.transfer_event",
       Protobuf.encode<token.transfer_arguments>(args, token.transfer_arguments.encode),
       impacted
     );
@@ -351,7 +352,7 @@ export class Token {
     );
     this.userContracts.put(args.account, new token.boole(args.enabled));
     System.event(
-      "koinos.contracts.token.set_authority_contract_event",
+      "token.set_authority_contract_event",
       this.callArgs!.args,
       [args.account]
     );
