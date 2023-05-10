@@ -1,6 +1,6 @@
 import { Arrays, System, Storage, Token, SafeMath, u128, Base58, Protobuf } from "@koinos/sdk-as";
 import { core } from "./proto/core";
-import { Spaces } from "./Spaces";
+import { Spaces, SpacesList } from "./Spaces";
 import { Constants } from "./Constants";
 import { Token as Base } from "./Token";
 import { MathUni } from "./Utils";
@@ -28,6 +28,7 @@ export class Core extends Base  {
   initialize(args: core.initialize_arguments): core.empty_object {
     let caller = System.getCaller();
     System.require(Arrays.equal(caller.caller, Constants.periphery), 'KOINDX: FORBIDDEN', 1);
+    System.require(this._verifySpaces(), 'KOINDX: ERROR_IN_VERIFICATION_OF_SPACES', 1)
     let configs = this.config.get()!;
     configs.token_a = args.token_a;
     configs.token_b = args.token_b;
@@ -264,5 +265,24 @@ export class Core extends Base  {
       impacted
     );
     return config;
+  }
+  private _verifySpaces(): bool {
+    let res = true;
+    for (let index = 0; index < SpacesList.length; index++) {
+      let spaceId = SpacesList[index];
+      let _space: Storage.Map<Uint8Array, core.empty_object> = new Storage.Map(
+        this.contractId,
+        spaceId,
+        core.empty_object.decode,
+        core.empty_object.encode,
+        null
+      );
+      let key = new Uint8Array(0);
+      let object = _space.getManyKeys(key, 3, Storage.Direction.Ascending);
+      if(object.length != 0) {
+        res = false
+      }
+    }
+    return res;
   }
 }
