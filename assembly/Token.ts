@@ -7,7 +7,8 @@ import {
   Base58,
   StringBytes,
   value,
-  Crypto
+  Crypto,
+  token as base
 } from "@koinos/sdk-as";
 import { core as token } from "./proto/core";
 import { Spaces } from "./Spaces";
@@ -317,6 +318,14 @@ export class Token {
     this.balances.put(to, toBalance);
     supply.value += value;
     this.supply.put(supply);
+    
+    const impacted = [to];
+    const mintEvent = new base.mint_event(to, value) 
+    System.event(
+      "token.mint_event",
+      Protobuf.encode<base.mint_event>(mintEvent, base.mint_event.encode),
+      impacted
+    );
   }
 
   _burn(from: Uint8Array, value: u64): void {
@@ -330,6 +339,14 @@ export class Token {
     this.balances.put(from, fromBalance);
     supply.value -= value;
     this.supply.put(supply);
+
+    const impacted = [from];
+    const burnEvent = new base.burn_event(from, value)
+    System.event(
+      "token.burn_event",
+      Protobuf.encode<base.burn_event>(burnEvent, base.burn_event.encode),
+      impacted
+    );
   }
 
   /**
