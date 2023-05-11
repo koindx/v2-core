@@ -6,5 +6,5 @@ export namespace Constants {
   export const decimals: u32 = 8;
 
   // address
-  export const periphery: Uint8Array = Base58.decode('')
+  export const periphery: Uint8Array = Base58.decode('122MpHXb8aFF4xHZk6ESeHjRM5sBGLYxTc')
 }
