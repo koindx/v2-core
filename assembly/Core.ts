@@ -4,6 +4,9 @@ import { Spaces, SpacesList } from "./Spaces";
 import { Constants } from "./Constants";
 import { Token as Base } from "./Token";
 import { MathUni } from "./Utils";
+
+const MINIMUM_LIQUIDITY = 10000;
+
 export class Core extends Base  {
   _contractId: Uint8Array;
   
@@ -68,9 +71,9 @@ export class Core extends Base  {
     if(supply == 0) {
       let amountA = u128.fromU64(amount_a);
       let amountB = u128.fromU64(amount_b);
-      newShares = MathUni.sqrt( SafeMath.mul(amountA, amountB) );
+      newShares = SafeMath.sub(MathUni.sqrt( SafeMath.mul(amountA, amountB) ), MINIMUM_LIQUIDITY);
       // automatically mints the minimum liquidity for null
-      this._mint(Base58.decode(""), 10000);
+      this._mint(Base58.decode(""), MINIMUM_LIQUIDITY);
     } else {      
       let _position1 = SafeMath.mul(u128.fromU64(amount_a),  u128.fromU64(supply));
       let _position2 = SafeMath.mul(u128.fromU64(amount_b), u128.fromU64(supply));
