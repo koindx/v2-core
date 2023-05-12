@@ -158,6 +158,11 @@ message sync_arguments {}
 /*
 * Events
 */
+message initialize_event {
+  bytes pair = 1 [(koinos.btype) = ADDRESS];
+  bytes token_a = 2 [(koinos.btype) = ADDRESS];
+  bytes token_b = 3 [(koinos.btype) = ADDRESS];
+}
 message mint_event {
   bytes sender = 1 [(koinos.btype) = ADDRESS];
   uint64 amount_a = 2 [(koinos.btype) = ADDRESS];
