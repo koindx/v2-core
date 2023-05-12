@@ -36,14 +36,6 @@ export class Core extends Base  {
     configs.token_a = args.token_a;
     configs.token_b = args.token_b;
     this.config.put(configs);
-    // event
-    const impacted = [this._contractId];
-    let initializeEvent = new core.initialize_event(args.token_a, args.token_b);
-    System.event(
-      "core.initialize_event",
-      Protobuf.encode(initializeEvent, core.initialize_event.encode),
-      impacted
-    );
     return new core.empty_object();
   }
   get_reserves(args: core.get_reserves_arguments): core.get_reserves_result {
