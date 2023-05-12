@@ -4,6 +4,7 @@
   "license": "MIT",
   "dependencies": {
     "as-bigint": "^0.5.3",
+    "dotenv": "^16.0.3",
     "koilib": "^5.5.6",
     "koinos-proto-js": "^0.0.3",
     "local-koinos": "^0.0.5",
@@ -33,6 +34,7 @@
     "build:debug": "koinos-sdk-as-cli build-all debug 0 core.proto",
     "build:release": "koinos-sdk-as-cli build-all release 0 core.proto",
     "test": "koinos-sdk-as-cli run-tests",
-    "hash": "node scripts/hash.js"
+    "hash": "node scripts/hash.js",
+    "deploy": "node scripts/deploy.js"
   }
 }
