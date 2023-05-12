@@ -14,16 +14,14 @@ import { core as token } from "./proto/core";
 import { Spaces } from "./Spaces";
 import { Constants } from "./Constants";
 
-export const AUTHORIZE_CONTRACT_CALL_ENTRY_POINT = 0x10e5820f; // authorize_contract_call
+// export const AUTHORIZE_CONTRACT_CALL_ENTRY_POINT = 0x10e5820f; // authorize_contract_call
 
 export class Token {
-  callArgs: System.getArgumentsReturn | null;
-
   contractId: Uint8Array;
   supply: Storage.Obj<token.uint64>;
   balances: Storage.Map<Uint8Array, token.uint64>;
   allowances: Storage.Map<Uint8Array, token.uint64>;
-  userContracts: Storage.Map<Uint8Array, token.boole>;
+  // userContracts: Storage.Map<Uint8Array, token.boole>;
 
   constructor(contractId: Uint8Array) {
     this.contractId = contractId;
@@ -48,13 +46,13 @@ export class Token {
       token.uint64.encode,
       null
     );
-    this.userContracts = new Storage.Map(
-      this.contractId,
-      Spaces.USER_CONTRACTS_SPACE_ID,
-      token.boole.decode,
-      token.boole.encode,
-      () => new token.boole(false)
-    );
+    // this.userContracts = new Storage.Map(
+    //   this.contractId,
+    //   Spaces.USER_CONTRACTS_SPACE_ID,
+    //   token.boole.decode,
+    //   token.boole.encode,
+    //   () => new token.boole(false)
+    // );
   }
 
   name(args: token.name_arguments): token.str {
@@ -114,44 +112,44 @@ export class Token {
    * Internal function to call the contract of an account to request its
    * authority to perform an operation.
    */
-  is_authorized_by_contract_account(account: Uint8Array): bool {
-    const caller = System.getCaller();
-    const callRes = System.call(
-      account,
-      AUTHORIZE_CONTRACT_CALL_ENTRY_POINT,
-      Protobuf.encode(
-        new authority.authorize_arguments(
-          authority.authorization_type.contract_call,
-          new authority.call_data(
-            this.contractId,
-            this.callArgs!.entry_point,
-            caller.caller,
-            this.callArgs!.args
-          )
-        ),
-        authority.authorize_arguments.encode
-      )
-    );
-    if (callRes.code != 0) {
-      const errorMessage = `failed to call contract of ${Base58.encode(
-        account
-      )}: ${
-        callRes.res.error && callRes.res.error!.message
-          ? callRes.res.error!.message
-          : "unknown error"
-      }`;
-      System.exit(callRes.code, StringBytes.stringToBytes(errorMessage));
-    }
-    System.require(
-      callRes.res.object,
-      `empty response from ${Base58.encode(account)}`
-    );
+  // is_authorized_by_contract_account(account: Uint8Array): bool {
+  //   const caller = System.getCaller();
+  //   const callRes = System.call(
+  //     account,
+  //     AUTHORIZE_CONTRACT_CALL_ENTRY_POINT,
+  //     Protobuf.encode(
+  //       new authority.authorize_arguments(
+  //         authority.authorization_type.contract_call,
+  //         new authority.call_data(
+  //           this.contractId,
+  //           this.callArgs!.entry_point,
+  //           caller.caller,
+  //           this.callArgs!.args
+  //         )
+  //       ),
+  //       authority.authorize_arguments.encode
+  //     )
+  //   );
+  //   if (callRes.code != 0) {
+  //     const errorMessage = `failed to call contract of ${Base58.encode(
+  //       account
+  //     )}: ${
+  //       callRes.res.error && callRes.res.error!.message
+  //         ? callRes.res.error!.message
+  //         : "unknown error"
+  //     }`;
+  //     System.exit(callRes.code, StringBytes.stringToBytes(errorMessage));
+  //   }
+  //   System.require(
+  //     callRes.res.object,
+  //     `empty response from ${Base58.encode(account)}`
+  //   );
 
-    return Protobuf.decode<authority.authorize_result>(
-      callRes.res.object,
-      authority.authorize_result.decode
-    ).value;
-  }
+  //   return Protobuf.decode<authority.authorize_result>(
+  //     callRes.res.object,
+  //     authority.authorize_result.decode
+  //   ).value;
+  // }
 
   /**
    * Internal function to validate the authority of an operation.
@@ -226,10 +224,10 @@ export class Token {
 
       // check if the contract of the account authorizes the operation
       // TODO: to be replaced by the system call to get contract metadata
-      if (this.userContracts.get(account)!.value == true) {
-        System.log("Account contract called to resolve the authority");
-        return this.is_authorized_by_contract_account(account);
-      }
+      // if (this.userContracts.get(account)!.value == true) {
+      //   System.log("Account contract called to resolve the authority");
+      //   return this.is_authorized_by_contract_account(account);
+      // }
 
       // the transaction has a caller but none of the different
       // options authorized the operation, then it is rejected.
@@ -254,11 +252,11 @@ export class Token {
     // }
 
     // check if the account has a contract
-    if (this.userContracts.get(account)!.value == true) {
-      // consult the contract of the account
-      System.log("Account contract called to resolve the authority");
-      return this.is_authorized_by_contract_account(account);
-    }
+    // if (this.userContracts.get(account)!.value == true) {
+    //   // consult the contract of the account
+    //   System.log("Account contract called to resolve the authority");
+    //   return this.is_authorized_by_contract_account(account);
+    // }
 
     // there is no caller, no approval from allowances, and the account
     // doesn't have a contract then check if the account signed the transaction
@@ -280,7 +278,7 @@ export class Token {
     const impacted = [args.spender, args.owner];
     System.event(
       "token.approve_event",
-      this.callArgs!.args,
+      Protobuf.encode<token.approve_arguments>(args, token.approve_arguments.encode),
       impacted
     );
   }
@@ -356,25 +354,25 @@ export class Token {
    * Note: This is a temporary function while a new System call is
    * developed in koinos to get the contract metadata
    */
-  set_authority_contract(args: token.set_authority_contract_arguments): token.empty_object {
-    const isAuthorized = this.check_authority(args.account, false, 0);
-    System.require(
-      isAuthorized,
-      "set_authority_contract operation not authorized"
-    );
-    // test a call
-    System.require(
-      this.is_authorized_by_contract_account(args.account),
-      "not authorized by contract account"
-    );
-    this.userContracts.put(args.account, new token.boole(args.enabled));
-    System.event(
-      "token.set_authority_contract_event",
-      this.callArgs!.args,
-      [args.account]
-    );
-    return new token.empty_object();
-  }
+  // set_authority_contract(args: token.set_authority_contract_arguments): token.empty_object {
+  //   const isAuthorized = this.check_authority(args.account, false, 0);
+  //   System.require(
+  //     isAuthorized,
+  //     "set_authority_contract operation not authorized"
+  //   );
+  //   // test a call
+  //   System.require(
+  //     this.is_authorized_by_contract_account(args.account),
+  //     "not authorized by contract account"
+  //   );
+  //   this.userContracts.put(args.account, new token.boole(args.enabled));
+  //   System.event(
+  //     "token.set_authority_contract_event",
+  //     this.callArgs!.args,
+  //     [args.account]
+  //   );
+  //   return new token.empty_object();
+  // }
 
   approve(args: token.approve_arguments): token.empty_object {
     const isAuthorized = this.check_authority(args.owner, false, 0);

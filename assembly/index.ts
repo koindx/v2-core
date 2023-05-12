@@ -99,17 +99,6 @@ export function main(): i32 {
       break;
     }
 
-    case 0x052a4dbf: {
-      const args =
-        Protobuf.decode<ProtoNamespace.set_authority_contract_arguments>(
-          contractArgs.args,
-          ProtoNamespace.set_authority_contract_arguments.decode
-        );
-      const res = c.set_authority_contract(args);
-      retbuf = Protobuf.encode(res, ProtoNamespace.empty_object.encode);
-      break;
-    }
-
     case 0x6d0c5abf: {
       const args = Protobuf.decode<ProtoNamespace.get_reserves_arguments>(
         contractArgs.args,

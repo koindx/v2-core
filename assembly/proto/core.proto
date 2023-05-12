@@ -96,14 +96,6 @@ message approve_arguments {
   uint64 value = 3 [jstype = JS_STRING];
 }
 
-// @description Get balance of an account 1 
-// @read-only false
-// @result empty_object
-message set_authority_contract_arguments {
-  bytes account = 1 [(koinos.btype) = ADDRESS];
-  bool enabled = 2;
-}
-
 // @description initializing core contract
 // @read-only true
 message get_reserves_arguments {}
