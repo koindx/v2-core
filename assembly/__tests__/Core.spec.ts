@@ -96,7 +96,7 @@ describe('contract', () => {
 
     // mint liquidity initial and transfer liquidity
     _core.mint(new core.mint_arguments(MOCKADRESS, Base58.decode("")));
-    _core.transfer(new core.transfer_arguments(MOCKADRESS, CONTRACT_ID, 90000));
+    // _core.transfer(new core.transfer_arguments(MOCKADRESS, CONTRACT_ID, 90000));
 
     // burn tokens
     // let args = new core.burn_arguments();
