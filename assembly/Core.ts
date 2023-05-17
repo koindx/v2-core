@@ -55,7 +55,6 @@ export class Core extends Base  {
     );
   }
   mint(args: core.mint_arguments): core.uint64 {
-    let res = new core.empty_object();
     let caller = System.getCaller();
     System.require(Arrays.equal(caller.caller, Constants.periphery), 'KOINDX: FORBIDDEN', 1);
     // get configs
@@ -116,7 +115,6 @@ export class Core extends Base  {
     return new core.uint64(newShares);
   }
   burn(args: core.burn_arguments): core.burn_result {
-    let res = new core.empty_object();
     let caller = System.getCaller();
     System.require(Arrays.equal(caller.caller, Constants.periphery), 'KOINDX: FORBIDDEN', 1);
     // get configs
