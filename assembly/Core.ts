@@ -196,7 +196,7 @@ export class Core extends Base  {
 
     // amounts
     let amount0In = balance_a > SafeMath.sub(configs.reserve_a, args.amount_a) ? SafeMath.sub(balance_a, SafeMath.sub(configs.reserve_a, args.amount_a)) : 0;
-    let amount1In = balance_a > SafeMath.sub(configs.reserve_b, args.amount_b) ? SafeMath.sub(balance_b, SafeMath.sub(configs.reserve_b, args.amount_b)) : 0;
+    let amount1In = balance_b > SafeMath.sub(configs.reserve_b, args.amount_b) ? SafeMath.sub(balance_b, SafeMath.sub(configs.reserve_b, args.amount_b)) : 0;
     System.require(amount0In > 0 || amount1In > 0, 'KOINDX: INSUFFICIENT_INPUT_AMOUNT', 1);
 
     // update configs before save
