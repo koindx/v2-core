@@ -201,6 +201,11 @@ export class Core extends Base  {
 
     // update configs before save
     configs = this._update(configs, balance_a, balance_b);
+
+    // save configs
+    this.config.put(configs);
+
+    // event
     const impacted = [args.to];
     let swapEvent = new core.swap_event(args.to, caller.caller, amount0In, amount1In);
     System.event(
