@@ -31,9 +31,7 @@ export class Core extends Base  {
     let caller = System.getCaller();
     System.require(Arrays.equal(caller.caller, Constants.periphery), 'KOINDX: FORBIDDEN', 1);
     System.require(this._verifySpaces(), 'KOINDX: ERROR_IN_VERIFICATION_OF_SPACES', 1)
-    let configs = this.config.get()!;
-    configs.token_a = args.token_a;
-    configs.token_b = args.token_b;
+    let configs = new core.config_object(args.token_a, args.token_b);
     this.config.put(configs);
     // event
     const impacted = [this._contractId];
