@@ -52,6 +52,13 @@ export class Core extends Base  {
       configs.block_time
     );
   }
+  get_tokens(args: core.get_tokens_arguments): core.get_tokens_result {
+    let configs = this.config.get()!;
+    return new core.get_tokens_result(
+      configs.token_a,
+      configs.token_b
+    );
+  }
   mint(args: core.mint_arguments): core.uint64 {
     let caller = System.getCaller();
     System.require(Arrays.equal(caller.caller, Constants.periphery), 'KOINDX: FORBIDDEN', 1);
