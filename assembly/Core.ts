@@ -205,7 +205,7 @@ export class Core extends Base  {
 
     // event
     const impacted = [args.to];
-    let swapEvent = new core.swap_event(args.to, caller.caller, amount0In, amount1In);
+    let swapEvent = new core.swap_event(args.to, caller.caller, amount0In, amount1In, args.amount_a, args.amount_b);
     System.event(
       "core.swap_event",
       Protobuf.encode(swapEvent, core.swap_event.encode),
