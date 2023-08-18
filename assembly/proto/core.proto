@@ -25,12 +25,14 @@ message info {
   uint32 decimals = 3;
 }
 message config_object {  
-  bytes token_a = 1 [(koinos.btype) = ADDRESS];
-  bytes token_b = 2 [(koinos.btype) = ADDRESS];
-  string k_last = 3;
-  uint64 reserve_a = 4 [jstype = JS_STRING];
-  uint64 reserve_b = 5 [jstype = JS_STRING];
-  uint64 block_time = 6 [jstype = JS_STRING];
+  bool initialized = 1;
+  bytes periphery = 2 [(koinos.btype) = ADDRESS];
+  bytes token_a = 3 [(koinos.btype) = ADDRESS];
+  bytes token_b = 4 [(koinos.btype) = ADDRESS];
+  string k_last = 5;
+  uint64 reserve_a = 6 [jstype = JS_STRING];
+  uint64 reserve_b = 7 [jstype = JS_STRING];
+  uint64 block_time = 8 [jstype = JS_STRING];
 }
 
 
