@@ -1,7 +1,6 @@
 import { Arrays, System, Storage, Token, SafeMath, u128, Base58, Protobuf } from "@koinos/sdk-as";
 import { core } from "./proto/core";
 import { Spaces, SpacesList } from "./Spaces";
-import { Constants } from "./Constants";
 import { Token as Base } from "./Token";
 import { MathUni } from "./Utils";
 
@@ -28,10 +27,16 @@ export class Core extends Base  {
     );
   }
   initialize(args: core.initialize_arguments): core.empty_object {
+    let configs = this.config.get()!
     let caller = System.getCaller();
-    System.require(Arrays.equal(caller.caller, Constants.periphery), 'KOINDX: FORBIDDEN', 1);
+    System.require(caller.caller.length, 'KOINDX: FORBIDDEN', 1);
     System.require(this._verifySpaces(), 'KOINDX: ERROR_IN_VERIFICATION_OF_SPACES', 1)
-    let configs = new core.config_object(args.token_a, args.token_b);
+    System.require(configs.initialized == false, 'KOINDX: ERROR_INITIALIZED_CONTRACT', 1)
+    // set configs
+    configs.initialized = true;
+    configs.periphery = caller.caller;
+    configs.token_a = args.token_a;
+    configs.token_b = args.token_b;
     this.config.put(configs);
     // event
     const impacted = [this._contractId];
@@ -60,10 +65,9 @@ export class Core extends Base  {
     );
   }
   mint(args: core.mint_arguments): core.uint64 {
-    let caller = System.getCaller();
-    System.require(Arrays.equal(caller.caller, Constants.periphery), 'KOINDX: FORBIDDEN', 1);
-    // get configs
     let configs = this.config.get()!;
+    let caller = System.getCaller();
+    System.require(Arrays.equal(caller.caller, configs.periphery), 'KOINDX: FORBIDDEN', 1);
     // instance tokens
     let token_a = new Token(configs.token_a);
     let token_b = new Token(configs.token_b);
@@ -120,10 +124,9 @@ export class Core extends Base  {
     return new core.uint64(newShares);
   }
   burn(args: core.burn_arguments): core.burn_result {
-    let caller = System.getCaller();
-    System.require(Arrays.equal(caller.caller, Constants.periphery), 'KOINDX: FORBIDDEN', 1);
-    // get configs
     let configs = this.config.get()!;
+    let caller = System.getCaller();
+    System.require(Arrays.equal(caller.caller, configs.periphery), 'KOINDX: FORBIDDEN', 1);
     // instance tokens
     let token_a = new Token(configs.token_a);
     let token_b = new Token(configs.token_b);
@@ -179,14 +182,12 @@ export class Core extends Base  {
     return new core.burn_result(token0Out, token1Out);
   }
   swap(args: core.swap_arguments): core.empty_object {
-    let caller = System.getCaller();
-    System.require(Arrays.equal(caller.caller, Constants.periphery), 'KOINDX: FORBIDDEN', 1);
-    System.require(args.amount_a > 0 || args.amount_b > 0, 'KOINDX: INSUFFICIENT_OUTPUT_AMOUNT', 1);
-    // get configs
     let configs = this.config.get()!;
+    let caller = System.getCaller();
+    System.require(Arrays.equal(caller.caller, configs.periphery), 'KOINDX: FORBIDDEN', 1);
+    System.require(args.amount_a > 0 || args.amount_b > 0, 'KOINDX: INSUFFICIENT_OUTPUT_AMOUNT', 1);
     System.require(args.amount_a < configs.reserve_a && args.amount_b < configs.reserve_b, 'KOINDX: INSUFFICIENT_LIQUIDITY', 1);
     System.require(!Arrays.equal(configs.token_a, args.to) && !Arrays.equal(configs.token_b, args.to), 'KOINDX: INVALID_TO', 1);
-
     // instance tokens
     let token_a = new Token(configs.token_a);
     let token_b = new Token(configs.token_b);
