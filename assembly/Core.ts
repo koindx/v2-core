@@ -35,12 +35,18 @@ export class Core extends Base  {
     // set configs
     configs.initialized = true;
     configs.periphery = caller.caller;
-    configs.token_a = args.token_a;
-    configs.token_b = args.token_b;
+    configs.token_a = args.token_a!;
+    configs.token_b = args.token_b!;
     this.config.put(configs);
     // event
     const impacted = [this._contractId];
-    let initializeEvent = new core.initialize_event(this._contractId, args.token_a, args.token_b);
+    let initializeEvent = new core.initialize_event(args.token_a!.nameservice, args.token_b!.nameservice);
+    if(args.token_a!.is_nameservice == false) {
+      initializeEvent.token_a = Base58.encode(args.token_a!.token_address);
+    }
+    if(args.token_b!.is_nameservice == false) {
+      initializeEvent.token_b = Base58.encode(args.token_b!.token_address);
+    }
     System.event(
       "core.initialize_event",
       Protobuf.encode(initializeEvent, core.initialize_event.encode),
@@ -60,8 +66,8 @@ export class Core extends Base  {
   get_tokens(args: core.get_tokens_arguments): core.get_tokens_result {
     let configs = this.config.get()!;
     return new core.get_tokens_result(
-      configs.token_a,
-      configs.token_b
+      this._getTokenAddress(configs.token_a!),
+      this._getTokenAddress(configs.token_b!)
     );
   }
   mint(args: core.mint_arguments): core.uint64 {
@@ -69,8 +75,8 @@ export class Core extends Base  {
     let caller = System.getCaller();
     System.require(Arrays.equal(caller.caller, configs.periphery), 'KOINDX: FORBIDDEN', 1);
     // instance tokens
-    let token_a = new Token(configs.token_a);
-    let token_b = new Token(configs.token_b);
+    let token_a = new Token(this._getTokenAddress(configs.token_a!));
+    let token_b = new Token(this._getTokenAddress(configs.token_b!));
     // get balance
     let balance_a = token_a.balanceOf(this._contractId);
     let balance_b = token_b.balanceOf(this._contractId);
@@ -128,8 +134,8 @@ export class Core extends Base  {
     let caller = System.getCaller();
     System.require(Arrays.equal(caller.caller, configs.periphery), 'KOINDX: FORBIDDEN', 1);
     // instance tokens
-    let token_a = new Token(configs.token_a);
-    let token_b = new Token(configs.token_b);
+    let token_a = new Token(this._getTokenAddress(configs.token_a!));
+    let token_b = new Token(this._getTokenAddress(configs.token_b!));
 
     // get balance and supply
     let balance_a = token_a.balanceOf(this._contractId);
@@ -184,13 +190,15 @@ export class Core extends Base  {
   swap(args: core.swap_arguments): core.empty_object {
     let configs = this.config.get()!;
     let caller = System.getCaller();
+    let tokenAddressA = this._getTokenAddress(configs.token_a!);
+    let tokenAddressB = this._getTokenAddress(configs.token_b!);
     System.require(Arrays.equal(caller.caller, configs.periphery), 'KOINDX: FORBIDDEN', 1);
     System.require(args.amount_a > 0 || args.amount_b > 0, 'KOINDX: INSUFFICIENT_OUTPUT_AMOUNT', 1);
     System.require(args.amount_a < configs.reserve_a && args.amount_b < configs.reserve_b, 'KOINDX: INSUFFICIENT_LIQUIDITY', 1);
-    System.require(!Arrays.equal(configs.token_a, args.to) && !Arrays.equal(configs.token_b, args.to), 'KOINDX: INVALID_TO', 1);
+    System.require(!Arrays.equal(tokenAddressA, args.to) && !Arrays.equal(tokenAddressB, args.to), 'KOINDX: INVALID_TO', 1);
     // instance tokens
-    let token_a = new Token(configs.token_a);
-    let token_b = new Token(configs.token_b);
+    let token_a = new Token(tokenAddressA);
+    let token_b = new Token(tokenAddressB);
     if(args.amount_a) {
       System.require(token_a.transfer(this._contractId, args.to, args.amount_a), "KOINDX: FAIL_TRANSFER_TOKEN_A", 1);
     }
@@ -223,8 +231,8 @@ export class Core extends Base  {
   }
   skim(args: core.skim_arguments): core.empty_object {
     let configs = this.config.get()!;
-    let token_a = new Token(configs.token_a);
-    let token_b = new Token(configs.token_b);
+    let token_a = new Token(this._getTokenAddress(configs.token_a!));
+    let token_b = new Token(this._getTokenAddress(configs.token_b!));
     let balance_a = token_a.balanceOf(this._contractId);
     let balance_b = token_b.balanceOf(this._contractId);
     System.require(token_a.transfer(this._contractId, args.to, SafeMath.sub(balance_a, configs.reserve_a)), "KOINDX: FAIL_TRANSFER_TOKEN_A", 1);
@@ -233,8 +241,8 @@ export class Core extends Base  {
   }
   sync(args: core.sync_arguments): core.empty_object {
     let configs = this.config.get()!;
-    let token_a = new Token(configs.token_a);
-    let token_b = new Token(configs.token_b);
+    let token_a = new Token(this._getTokenAddress(configs.token_a!));
+    let token_b = new Token(this._getTokenAddress(configs.token_b!));
     let balance_a = token_a.balanceOf(this._contractId);
     let balance_b = token_b.balanceOf(this._contractId);
     configs = this._update(configs, balance_a, balance_b);
@@ -284,6 +292,12 @@ export class Core extends Base  {
       impacted
     );
     return config;
+  }
+  private _getTokenAddress(_token: core.token_object): Uint8Array {
+    if(_token.is_nameservice) {
+      return System.getContractAddress(_token.nameservice);
+    }
+    return _token.token_address;
   }
   private _verifySpaces(): bool {
     let res = true;
