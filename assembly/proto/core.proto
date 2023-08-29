@@ -94,7 +94,7 @@ message transfer_arguments {
   uint64 value = 3 [jstype = JS_STRING];
 }
 
-// @description Sets `amount` as the allowance of `spender` over the caller's tokens.
+// @description Sets `value` as the allowance of `spender` over the caller's tokens.
 // @read-only false
 // @result empty_object
 message approve_arguments {
