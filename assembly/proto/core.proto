@@ -24,13 +24,20 @@ message info {
   string symbol = 2;
   uint32 decimals = 3;
 }
+message token_object {
+  bool is_nameservice = 1;
+  string nameservice = 2;
+  bytes token_address = 3 [(koinos.btype) = ADDRESS];
+}
 message config_object {  
-  bytes token_a = 2 [(koinos.btype) = ADDRESS];
-  bytes token_b = 3 [(koinos.btype) = ADDRESS];
-  string k_last = 4;
-  uint64 reserve_a = 5 [jstype = JS_STRING];
-  uint64 reserve_b = 6 [jstype = JS_STRING];
-  uint64 block_time = 7 [jstype = JS_STRING];
+  bool initialized = 1;
+  bytes periphery = 2 [(koinos.btype) = ADDRESS];
+  token_object token_a = 3;
+  token_object token_b = 4;
+  string k_last = 5;
+  uint64 reserve_a = 6 [jstype = JS_STRING];
+  uint64 reserve_b = 7 [jstype = JS_STRING];
+  uint64 block_time = 8 [jstype = JS_STRING];
 }
 
 
@@ -63,14 +70,14 @@ message get_info_arguments {}
 // @result uint64
 message total_supply_arguments {}
 
-// @description Get balance of an account 7
+// @description Get balance of an account
 // @read-only true
 // @result uint64
 message balance_of_arguments {
   bytes owner = 1 [(koinos.btype) = ADDRESS];
 }
 
-// @description Get balance of an account2 
+// @description Get allowance of an account
 // @read-only true
 // @result uint64
 message allowance_arguments {
@@ -78,7 +85,7 @@ message allowance_arguments {
   bytes spender = 2 [(koinos.btype) = ADDRESS];
 }
 
-// @description Get balance of an account 6
+// @description transfer tokens of an account
 // @read-only false
 // @result empty_object
 message transfer_arguments {
@@ -87,7 +94,7 @@ message transfer_arguments {
   uint64 value = 3 [jstype = JS_STRING];
 }
 
-// @description Get balance of an account 3
+// @description Sets `value` as the allowance of `spender` over the caller's tokens.
 // @read-only false
 // @result empty_object
 message approve_arguments {
@@ -96,7 +103,7 @@ message approve_arguments {
   uint64 value = 3 [jstype = JS_STRING];
 }
 
-// @description initializing core contract
+// @description get reserves of a pool
 // @read-only true
 message get_reserves_arguments {}
 message get_reserves_result {
@@ -106,15 +113,23 @@ message get_reserves_result {
   uint64 block_time = 4 [jstype = JS_STRING];
 }
 
-// @description initializing core contract
-// @read-only false
-// @result empty_object
-message initialize_arguments {
+// @description get tokens of a pool
+// @read-only true
+message get_tokens_arguments {}
+message get_tokens_result {
   bytes token_a = 1 [(koinos.btype) = ADDRESS];
   bytes token_b = 2 [(koinos.btype) = ADDRESS];
 }
 
-// @description mint core contract
+// @description initializing core contract
+// @read-only false
+// @result empty_object
+message initialize_arguments {
+  token_object token_a = 1;
+  token_object token_b = 2;
+}
+
+// @description mint tokens of pool
 // @read-only false
 // @result uint64
 message mint_arguments {
@@ -122,7 +137,7 @@ message mint_arguments {
   bytes fee = 2 [(koinos.btype) = ADDRESS];
 }
 
-// @description mint core contract
+// @description burn tokens of pool
 // @read-only false
 message burn_arguments {
   bytes to = 1 [(koinos.btype) = ADDRESS];
@@ -133,7 +148,7 @@ message burn_result {
   uint64 amount_b = 2 [jstype = JS_STRING];
 }
 
-// @description swap core contract
+// @description swap tokens contract
 // @read-only false
 // @result empty_object
 message swap_arguments {
@@ -142,14 +157,14 @@ message swap_arguments {
   uint64 amount_b = 3 [jstype = JS_STRING];
 }
 
-// @description swap core contract
+// @description synchronizes the number of tokens with the reserves
 // @read-only false
 // @result empty_object
 message skim_arguments {
   bytes to = 1 [(koinos.btype) = ADDRESS];
 }
 
-// @description swap core contract
+// @description synchronizes the pool values ​​with the number of tokens
 // @read-only false
 // @result empty_object
 message sync_arguments {}
@@ -159,9 +174,8 @@ message sync_arguments {}
 * Events
 */
 message initialize_event {
-  bytes pair = 1 [(koinos.btype) = ADDRESS];
-  bytes token_a = 2 [(koinos.btype) = ADDRESS];
-  bytes token_b = 3 [(koinos.btype) = ADDRESS];
+  string token_a = 1;
+  string token_b = 2;
 }
 message mint_event {
   bytes sender = 1 [(koinos.btype) = ADDRESS];
