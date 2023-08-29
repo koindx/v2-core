@@ -103,7 +103,7 @@ message approve_arguments {
   uint64 value = 3 [jstype = JS_STRING];
 }
 
-// @description get reserver of a pool
+// @description get reserves of a pool
 // @read-only true
 message get_reserves_arguments {}
 message get_reserves_result {
